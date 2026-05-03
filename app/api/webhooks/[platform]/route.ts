@@ -4,15 +4,12 @@
  */
 
 import { after } from "next/server";
-import { bot } from "@/lib/bot";
+import { getBot } from "@/lib/bot";
 
 // Type for route context with platform param
 type RouteContext = {
   params: Promise<{ platform: string }>;
 };
-
-// Type for platform keys
-type Platform = keyof typeof bot.webhooks;
 
 /**
  * POST handler for incoming webhook events
@@ -20,8 +17,11 @@ type Platform = keyof typeof bot.webhooks;
 export async function POST(request: Request, context: RouteContext) {
   const { platform } = await context.params;
 
+  // Get the bot instance lazily at runtime
+  const bot = getBot();
+
   // Get the handler for this platform
-  const handler = bot.webhooks[platform as Platform];
+  const handler = bot.webhooks[platform as keyof typeof bot.webhooks];
 
   if (!handler) {
     return new Response(`Unknown platform: ${platform}`, { status: 404 });

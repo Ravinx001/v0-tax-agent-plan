@@ -10,7 +10,9 @@ import {
   Car,
   FileText,
   Smartphone,
+  Globe,
 } from "lucide-react";
+import Link from "next/link";
 
 // WhatsApp number - replace with your actual number (include country code, no + or spaces)
 const WHATSAPP_NUMBER = "94XXXXXXXXX"; // Example: 94771234567 for Sri Lanka
@@ -73,10 +75,16 @@ export default function HomePage() {
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-pretty text-lg text-muted-foreground md:text-xl">
             Get accurate estimates for customs duty, excise duty, VAT, and more.
-            Chat with TaxBot on Slack or WhatsApp and get instant answers.
+            Chat with TaxBot on the web, Slack, or WhatsApp and get instant answers.
           </p>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
             <Button size="lg" className="gap-2" asChild>
+              <Link href="/chat">
+                <Globe className="h-5 w-5" />
+                Chat on Web
+              </Link>
+            </Button>
+            <Button size="lg" variant="secondary" className="gap-2" asChild>
               <a
                 href="https://slack.com/oauth/v2/authorize"
                 target="_blank"
@@ -248,7 +256,7 @@ export default function HomePage() {
               How it works
             </h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
-              Get started in under a minute. Choose Slack for your workspace or WhatsApp for mobile.
+              Get started in under a minute. Use the web chat, Slack, or WhatsApp.
             </p>
           </div>
 
@@ -256,6 +264,9 @@ export default function HomePage() {
           <div className="mb-12 flex justify-center">
             <div className="inline-flex rounded-lg bg-secondary p-1">
               <span className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                Web
+              </span>
+              <span className="px-4 py-2 text-sm font-medium text-muted-foreground">
                 Slack
               </span>
               <span className="px-4 py-2 text-sm font-medium text-muted-foreground">
@@ -273,7 +284,7 @@ export default function HomePage() {
                 Connect
               </h3>
               <p className="text-sm text-muted-foreground">
-                Add TaxBot to Slack with one click, or save our WhatsApp number to your contacts.
+                Sign up for web chat, add TaxBot to Slack, or message our WhatsApp number.
               </p>
             </div>
 
@@ -435,8 +446,14 @@ export default function HomePage() {
           <p className="mb-8 text-muted-foreground">
             Chat with TaxBot on your preferred platform and get instant tax estimates for any vehicle.
           </p>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
             <Button size="lg" className="gap-2" asChild>
+              <Link href="/chat">
+                <Globe className="h-5 w-5" />
+                Chat on Web
+              </Link>
+            </Button>
+            <Button size="lg" variant="secondary" className="gap-2" asChild>
               <a
                 href="https://slack.com/oauth/v2/authorize"
                 target="_blank"

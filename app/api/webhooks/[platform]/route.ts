@@ -38,10 +38,30 @@ export async function POST(request: Request, context: RouteContext) {
  */
 export async function GET(request: Request, context: RouteContext) {
   const { platform } = await context.params;
+  const url = new URL(request.url);
+
+  // WhatsApp webhook verification
+  // Meta sends: hub.mode, hub.verify_token, hub.challenge
+  if (platform === "whatsapp") {
+    const mode = url.searchParams.get("hub.mode");
+    const token = url.searchParams.get("hub.verify_token");
+    const challenge = url.searchParams.get("hub.challenge");
+
+    // Verify the token matches our configured verify token
+    if (mode === "subscribe" && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+      console.log("[TaxBot] WhatsApp webhook verified successfully");
+      return new Response(challenge, {
+        status: 200,
+        headers: { "Content-Type": "text/plain" },
+      });
+    } else {
+      console.log("[TaxBot] WhatsApp webhook verification failed");
+      return new Response("Forbidden", { status: 403 });
+    }
+  }
 
   // Slack URL verification challenge
   if (platform === "slack") {
-    const url = new URL(request.url);
     const challenge = url.searchParams.get("challenge");
     if (challenge) {
       return new Response(challenge, {

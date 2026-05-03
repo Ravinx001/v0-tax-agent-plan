@@ -17,6 +17,9 @@ importers:
       '@chat-adapter/state-redis':
         specifier: ^4.27.0
         version: 4.27.0(@opentelemetry/api@1.9.0)
+      '@chat-adapter/whatsapp':
+        specifier: ^4.27.0
+        version: 4.27.0
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.71.1(react@19.2.4))
@@ -239,6 +242,9 @@ packages:
 
   '@chat-adapter/state-redis@4.27.0':
     resolution: {integrity: sha512-kmfCzNUQOCZ6MxBmd0azdJAmbAbgJ87JkW0/kQWEZ9vmlf8F5VlmRSfvn9jWhh4R90ThpLeflmIaHX8iK4x2dA==}
+
+  '@chat-adapter/whatsapp@4.27.0':
+    resolution: {integrity: sha512-bI1NmzobQLnKVR/iiO0EgUkS32YWfI0kMGCKPl2at6cXVVambONF7lTZ4P97eceuC06LVbZTaKTrW6HhB078XA==}
 
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
@@ -2312,6 +2318,13 @@ snapshots:
     transitivePeerDependencies:
       - '@node-rs/xxhash'
       - '@opentelemetry/api'
+      - supports-color
+
+  '@chat-adapter/whatsapp@4.27.0':
+    dependencies:
+      '@chat-adapter/shared': 4.27.0
+      chat: 4.27.0
+    transitivePeerDependencies:
       - supports-color
 
   '@date-fns/tz@1.4.1': {}

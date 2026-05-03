@@ -9,7 +9,11 @@ import {
   BarChart3,
   Car,
   FileText,
+  Smartphone,
 } from "lucide-react";
+
+// WhatsApp number - replace with your actual number (include country code, no + or spaces)
+const WHATSAPP_NUMBER = "94XXXXXXXXX"; // Example: 94771234567 for Sri Lanka
 
 export default function HomePage() {
   return (
@@ -69,7 +73,7 @@ export default function HomePage() {
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-pretty text-lg text-muted-foreground md:text-xl">
             Get accurate estimates for customs duty, excise duty, VAT, and more.
-            Just ask TaxBot in Slack and get instant answers.
+            Chat with TaxBot on Slack or WhatsApp and get instant answers.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" className="gap-2" asChild>
@@ -86,6 +90,22 @@ export default function HomePage() {
                   <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" />
                 </svg>
                 Add to Slack
+              </a>
+            </Button>
+            <Button size="lg" variant="secondary" className="gap-2" asChild>
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20TaxBot!%20I%20want%20to%20calculate%20vehicle%20import%20tax.`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                Chat on WhatsApp
               </a>
             </Button>
             <Button variant="outline" size="lg" asChild>
@@ -198,6 +218,21 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
+
+            <Card className="border-border bg-card">
+              <CardContent className="p-6">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <Smartphone className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-card-foreground">
+                  Multi-Platform Access
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Use Slack from your workspace or WhatsApp from your phone.
+                  Same AI, wherever you are.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -213,9 +248,20 @@ export default function HomePage() {
               How it works
             </h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
-              Get started in under a minute. No signup required beyond adding to
-              Slack.
+              Get started in under a minute. Choose Slack for your workspace or WhatsApp for mobile.
             </p>
+          </div>
+
+          {/* Platform Tabs */}
+          <div className="mb-12 flex justify-center">
+            <div className="inline-flex rounded-lg bg-secondary p-1">
+              <span className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                Slack
+              </span>
+              <span className="px-4 py-2 text-sm font-medium text-muted-foreground">
+                WhatsApp
+              </span>
+            </div>
           </div>
 
           <div className="grid gap-8 md:grid-cols-3">
@@ -224,11 +270,10 @@ export default function HomePage() {
                 1
               </div>
               <h3 className="mb-2 text-lg font-semibold text-foreground">
-                Add to Slack
+                Connect
               </h3>
               <p className="text-sm text-muted-foreground">
-                Click the button above to add TaxBot to your Slack workspace.
-                Takes just a few seconds.
+                Add TaxBot to Slack with one click, or save our WhatsApp number to your contacts.
               </p>
             </div>
 
@@ -237,11 +282,10 @@ export default function HomePage() {
                 2
               </div>
               <h3 className="mb-2 text-lg font-semibold text-foreground">
-                @mention TaxBot
+                Describe Your Vehicle
               </h3>
               <p className="text-sm text-muted-foreground">
-                In any channel or DM, mention @TaxBot and describe the vehicle
-                you want to import.
+                Tell us the CIF value, engine size, fuel type, and year. We will ask if anything is missing.
               </p>
             </div>
 
@@ -384,26 +428,39 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="border-t border-border bg-primary/5 px-6 py-24">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
             Ready to calculate your import costs?
           </h2>
           <p className="mb-8 text-muted-foreground">
-            Add TaxBot to your Slack workspace and get instant tax estimates for
-            any vehicle.
+            Chat with TaxBot on your preferred platform and get instant tax estimates for any vehicle.
           </p>
-          <Button size="lg" className="gap-2" asChild>
-            <a
-              href="https://slack.com/oauth/v2/authorize"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" />
-              </svg>
-              Add TaxBot to Slack
-            </a>
-          </Button>
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button size="lg" className="gap-2" asChild>
+              <a
+                href="https://slack.com/oauth/v2/authorize"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" />
+                </svg>
+                Add to Slack
+              </a>
+            </Button>
+            <Button size="lg" variant="secondary" className="gap-2" asChild>
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20TaxBot!%20I%20want%20to%20calculate%20vehicle%20import%20tax.`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                Chat on WhatsApp
+              </a>
+            </Button>
+          </div>
         </div>
       </section>
 

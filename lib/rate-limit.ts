@@ -3,11 +3,23 @@ import { Redis } from "@upstash/redis";
 // Daily message limit per user
 export const DAILY_MESSAGE_LIMIT = 20;
 
-// Redis client (uses KV_REST_API_URL and KV_REST_API_TOKEN from env)
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
-});
+// Lazy Redis client initialization to avoid build-time errors
+let _redis: Redis | null = null;
+
+function getRedis(): Redis | null {
+  if (_redis) return _redis;
+  
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  
+  if (!url || !token) {
+    console.warn("[TaxBot] Redis not configured - rate limiting disabled");
+    return null;
+  }
+  
+  _redis = new Redis({ url, token });
+  return _redis;
+}
 
 /**
  * Get the Redis key for a user's daily message count
@@ -42,6 +54,17 @@ export interface RateLimitResult {
 export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   const key = getDailyKey(userId);
   const resetInSeconds = getSecondsUntilMidnight();
+  const redis = getRedis();
+
+  // If Redis is not configured, allow all requests
+  if (!redis) {
+    return {
+      allowed: true,
+      remaining: DAILY_MESSAGE_LIMIT,
+      limit: DAILY_MESSAGE_LIMIT,
+      resetInSeconds,
+    };
+  }
 
   try {
     // Get current count
@@ -86,6 +109,13 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
  */
 export async function getRemainingMessages(userId: string): Promise<number> {
   const key = getDailyKey(userId);
+  const redis = getRedis();
+  
+  // If Redis is not configured, return full limit
+  if (!redis) {
+    return DAILY_MESSAGE_LIMIT;
+  }
+  
   try {
     const currentCount = (await redis.get<number>(key)) ?? 0;
     return Math.max(0, DAILY_MESSAGE_LIMIT - currentCount);

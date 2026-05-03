@@ -4,8 +4,8 @@ import { checkRateLimit, DAILY_MESSAGE_LIMIT } from "@/lib/rate-limit";
 import { taxBotTools } from "@/lib/tools";
 import { SYSTEM_PROMPT } from "@/lib/prompts";
 
-// AI model for web chat
-const MODEL = "anthropic/claude-sonnet-4-20250514";
+// AI model for web chat - using standard Claude model available via AI Gateway
+const MODEL = "anthropic/claude-3-5-sonnet-20241022";
 
 export async function POST(req: Request) {
   try {

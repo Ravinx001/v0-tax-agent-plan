@@ -1,14 +1,28 @@
-import { streamText, convertToModelMessages, type UIMessage } from "ai";
+import {
+  streamText,
+  convertToModelMessages,
+  stepCountIs,
+  type UIMessage,
+} from "ai";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, DAILY_MESSAGE_LIMIT } from "@/lib/rate-limit";
 import { taxBotTools } from "@/lib/tools";
 import { SYSTEM_PROMPT } from "@/lib/prompts";
-
-// AI model for web chat - using standard Claude model available via AI Gateway
-const MODEL = "anthropic/claude-3-5-sonnet-20241022";
+import { getGeminiApiKey, getTaxBotGeminiModel } from "@/lib/gemini";
 
 export async function POST(req: Request) {
   try {
+    if (!getGeminiApiKey()) {
+      return new Response(
+        JSON.stringify({
+          error: "ConfigurationError",
+          message:
+            "GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY) is not set. Add it to .env.local — see https://aistudio.google.com/apikey",
+        }),
+        { status: 503, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     // Get authenticated user
     const supabase = await createClient();
     const {
@@ -56,13 +70,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Stream AI response with tool support
+    // Stream AI response with tool support (multi-step tool loop)
     const result = streamText({
-      model: MODEL,
+      model: getTaxBotGeminiModel(),
       system: SYSTEM_PROMPT,
       messages: await convertToModelMessages(messages),
       tools: taxBotTools,
-      maxSteps: 5, // Allow multiple tool calls per turn
+      stopWhen: stepCountIs(5),
     });
 
     // Return streaming response with rate limit headers

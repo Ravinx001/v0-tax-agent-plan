@@ -263,8 +263,12 @@ export default function ChatPage() {
           <div className="mx-auto max-w-4xl">
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="flex items-center justify-between">
-                <span>Something went wrong. Please try again.</span>
+              <AlertDescription className="flex items-center justify-between gap-2">
+                <span className="text-left">
+                  {error?.message?.trim()
+                    ? error.message
+                    : "Something went wrong. Please try again."}
+                </span>
                 <Button
                   variant="ghost"
                   size="sm"

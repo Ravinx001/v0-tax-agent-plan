@@ -10,12 +10,11 @@ import { Chat } from "chat";
 import { createSlackAdapter } from "@chat-adapter/slack";
 import { createWhatsAppAdapter } from "@chat-adapter/whatsapp";
 import { createRedisState } from "@chat-adapter/state-redis";
-import { streamText } from "ai";
+import { streamText, stepCountIs } from "ai";
 import { taxBotTools } from "./tools";
 import { SYSTEM_PROMPT, WHATSAPP_SYSTEM_PROMPT, INTRO_MESSAGE, WHATSAPP_INTRO_MESSAGE } from "./prompts";
-
-// Model to use (via Vercel AI Gateway)
-const MODEL = "anthropic/claude-sonnet-4-20250514";
+import { getGeminiApiKey, getTaxBotGeminiModel } from "./gemini";
+import { createChatMemoryState } from "./chat-memory-state";
 
 /**
  * Helper to detect if current adapter is WhatsApp
@@ -69,8 +68,7 @@ export function getBot(): Chat {
   _bot = new Chat({
     userName: "taxbot",
     adapters,
-    // Redis state - uses REDIS_URL or KV_REST_API_URL/TOKEN from Upstash
-    state: hasRedis ? createRedisState() : undefined,
+    state: hasRedis ? createRedisState() : createChatMemoryState(),
   });
 
   // Register event handlers
@@ -109,13 +107,18 @@ function setupEventHandlers(bot: Chat) {
 
     // If there's actual content beyond just the mention, process it
     if (messages.length > 0 && messages[0].content.trim().length > 5) {
-      // Stream AI response
+      if (!getGeminiApiKey()) {
+        await thread.post(
+          "TaxBot is not configured: set GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY) on the server."
+        );
+        return;
+      }
       const result = streamText({
-        model: MODEL,
+        model: getTaxBotGeminiModel(),
         system: systemPrompt,
         messages,
         tools: taxBotTools,
-        maxSteps: 5,
+        stopWhen: stepCountIs(5),
       });
 
       await thread.post(result.textStream);
@@ -146,16 +149,21 @@ function setupEventHandlers(bot: Chat) {
       });
     }
 
-    // Stream AI response with tool support
+    if (!getGeminiApiKey()) {
+      await thread.post(
+        "TaxBot is not configured: set GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY) on the server."
+      );
+      return;
+    }
+
     const result = streamText({
-      model: MODEL,
+      model: getTaxBotGeminiModel(),
       system: systemPrompt,
       messages: history,
       tools: taxBotTools,
-      maxSteps: 5, // Allow multiple tool calls per turn
+      stopWhen: stepCountIs(5),
     });
 
-    // Post streaming response (buffered for WhatsApp, real-time for Slack)
     await thread.post(result.textStream);
   });
 
@@ -163,18 +171,17 @@ function setupEventHandlers(bot: Chat) {
    * Handle reactions (optional - for feedback collection)
    */
   bot.onReaction(["thumbsup", "thumbsdown", "+1", "-1"], async (event) => {
-    // Could log feedback here for improvement
     console.log(
-      `[TaxBot] Received ${event.reaction} reaction from ${event.user.fullName}`
+      `[TaxBot] Received ${event.rawEmoji} reaction from ${event.user.fullName}`
     );
   });
 }
 
 // For backwards compatibility, export bot as a getter
 // This will throw at runtime if env vars are missing, but won't fail at build time
-export const bot = new Proxy({} as Chat, {
+export const bot = new Proxy({} as InstanceType<typeof Chat>, {
   get(_, prop) {
-    return (getBot() as Record<string | symbol, unknown>)[prop];
+    return (getBot() as unknown as Record<string | symbol, unknown>)[prop];
   },
 });
 

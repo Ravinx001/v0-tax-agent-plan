@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
+import { DefaultChatTransport } from "ai";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,28 +21,11 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getMessageText, hasPendingToolWork } from "@/lib/chat-message-utils";
+import { AssistantMessageBody } from "@/components/chat/AssistantMessageBody";
 
 // Rate limit info
 const DAILY_LIMIT = 20;
-
-/**
- * Extract text content from UIMessage parts
- */
-function getMessageText(message: UIMessage): string {
-  if (!message.parts || !Array.isArray(message.parts)) return "";
-  return message.parts
-    .filter((p): p is { type: "text"; text: string } => p.type === "text")
-    .map((p) => p.text)
-    .join("");
-}
-
-/**
- * Check if message has tool calls
- */
-function hasToolCalls(message: UIMessage): boolean {
-  if (!message.parts || !Array.isArray(message.parts)) return false;
-  return message.parts.some((p) => p.type === "tool-invocation");
-}
 
 export default function ChatPage() {
   const [remaining, setRemaining] = useState<number>(DAILY_LIMIT);
@@ -173,6 +156,7 @@ export default function ChatPage() {
                   "Calculate tax for a 2022 Toyota Prius",
                   "Compare petrol vs hybrid taxes",
                   "What are the current tax rates?",
+                  "What vehicles does Sri Lanka import most?",
                 ].map((prompt) => (
                   <Button
                     key={prompt}
@@ -206,18 +190,21 @@ export default function ChatPage() {
                   }`}
                 >
                   <CardContent className="p-3">
-                    {/* Tool invocation indicator */}
-                    {hasToolCalls(message) && (
-                      <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-                        <Calculator className="h-3 w-3" />
-                        <span>Calculating taxes...</span>
+                    {message.role === "assistant" ? (
+                      <>
+                        {hasPendingToolWork(message) && (
+                          <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                            <Calculator className="h-3 w-3 animate-pulse" />
+                            <span>Running tools…</span>
+                          </div>
+                        )}
+                        <AssistantMessageBody message={message} />
+                      </>
+                    ) : (
+                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                        {getMessageText(message)}
                       </div>
                     )}
-
-                    {/* Message text */}
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {getMessageText(message)}
-                    </div>
                   </CardContent>
                 </Card>
               </div>

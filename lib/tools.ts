@@ -14,6 +14,7 @@ import {
   getSupportedFuelTypes,
   type FuelType,
 } from "./tax-engine";
+import { SL_IMPORT_MARKET_SNAPSHOT } from "./data/sl-import-market";
 
 // Zod schema for fuel type validation
 const fuelTypeSchema = z.enum([
@@ -223,6 +224,50 @@ Use this when the user asks what vehicle types are supported or needs to know th
 });
 
 /**
+ * Curated Sri Lanka import market context (no live web search).
+ */
+export const getSriLankaImportContextTool = tool({
+  description: `Return curated, source-linked notes about vehicle types commonly imported or discussed in Sri Lanka (segments, typical models, caveats).
+Use when the user asks what vehicles Sri Lanka imports most, market trends, popular models, auction imports, or similar context — before or alongside tax calculations.`,
+  inputSchema: z.object({
+    focus: z
+      .string()
+      .optional()
+      .describe(
+        "Optional user theme e.g. hybrid, suv, electric, sedan — used only to highlight relevant segments in the reply."
+      ),
+  }),
+  execute: async ({ focus }) => {
+    const snap = SL_IMPORT_MARKET_SNAPSHOT;
+    const lines = [
+      `Last reviewed (manual): ${snap.lastReviewed}`,
+      "",
+      snap.summary,
+      "",
+      "Segments:",
+      ...snap.segments.map(
+        (s) =>
+          `- ${s.name}: ${s.description} Typical: ${s.typicalModels.join(", ")}.`
+      ),
+      "",
+      "Discussion points:",
+      ...snap.commonDiscussionPoints.map((p) => `- ${p}`),
+      "",
+      "Caveats:",
+      ...snap.caveats.map((c) => `- ${c}`),
+      "",
+      "Sources:",
+      ...snap.sources.map((s) => `- ${s.label}: ${s.url}${s.note ? ` (${s.note})` : ""}`),
+    ];
+    return {
+      focus: focus?.trim() || null,
+      snapshot: snap,
+      summaryForAssistant: lines.join("\n"),
+    };
+  },
+});
+
+/**
  * All tools exported as a single object for use with AI SDK
  */
 export const taxBotTools = {
@@ -230,4 +275,5 @@ export const taxBotTools = {
   compare_fuel_types: compareFuelTypesTool,
   lookup_excise_rate: lookupExciseRateTool,
   list_supported_fuel_types: listSupportedFuelTypesTool,
+  get_sri_lanka_import_context: getSriLankaImportContextTool,
 };

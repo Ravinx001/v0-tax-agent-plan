@@ -14,8 +14,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// WhatsApp number - replace with your actual number (include country code, no + or spaces)
-const WHATSAPP_NUMBER = "94XXXXXXXXX"; // Example: 94771234567 for Sri Lanka
+// WhatsApp "Chat on WhatsApp" link uses wa.me — digits only, country code, no + or spaces.
+// Sri Lanka: 0XXXXXXXXX → 94XXXXXXXXX. Override in Vercel: NEXT_PUBLIC_WHATSAPP_NUMBER
+const WHATSAPP_NUMBER =
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "") || "94718826466";
 
 export default function HomePage() {
   return (
@@ -51,15 +53,23 @@ export default function HomePage() {
               Tax Rates
             </a>
           </nav>
-          <Button asChild>
-            <a
-              href="https://slack.com/oauth/v2/authorize"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Add to Slack
-            </a>
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button size="sm" className="gap-2" asChild>
+              <Link href="/chat">
+                <Globe className="h-4 w-4" />
+                Chat on Web
+              </Link>
+            </Button>
+            <Button size="sm" variant="outline" className="hidden sm:inline-flex" asChild>
+              <a
+                href="https://slack.com/oauth/v2/authorize"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Add to Slack
+              </a>
+            </Button>
+          </div>
         </div>
       </header>
 

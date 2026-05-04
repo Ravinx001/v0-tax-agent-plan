@@ -36,7 +36,11 @@ export function getBot(): Chat {
 
   // Check if we have the required environment variables
   const hasSlack = process.env.SLACK_BOT_TOKEN && process.env.SLACK_SIGNING_SECRET;
-  const hasWhatsApp = process.env.WHATSAPP_ACCESS_TOKEN && process.env.WHATSAPP_APP_SECRET;
+  const hasWhatsApp =
+    Boolean(process.env.WHATSAPP_ACCESS_TOKEN?.trim()) &&
+    Boolean(process.env.WHATSAPP_APP_SECRET?.trim()) &&
+    Boolean(process.env.WHATSAPP_PHONE_NUMBER_ID?.trim()) &&
+    Boolean(process.env.WHATSAPP_VERIFY_TOKEN?.trim());
   const hasRedis = process.env.REDIS_URL || (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 
   if (!hasSlack && !hasWhatsApp) {

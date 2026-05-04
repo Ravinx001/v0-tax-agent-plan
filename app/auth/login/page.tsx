@@ -12,15 +12,24 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+
+function formatAuthError(error: unknown): string {
+  if (error && typeof error === 'object' && 'message' in error) {
+    const msg = String((error as { message: string }).message)
+    if (msg.toLowerCase().includes('email not confirmed')) {
+      return 'Confirm your email before signing in. Check your inbox for the Supabase confirmation link, or ask an admin to confirm the user in the Supabase dashboard.'
+    }
+    return msg
+  }
+  return 'An error occurred'
+}
 
 export default function Page() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,16 +41,12 @@ export default function Page() {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo:
-            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ??
-            `${window.location.origin}/auth/callback`,
-        },
       })
       if (error) throw error
-      router.push('/chat')
+      // Full page load so middleware sees cookies set by the browser client (client router.push can race).
+      window.location.assign('/chat')
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(formatAuthError(error))
     } finally {
       setIsLoading(false)
     }

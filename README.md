@@ -262,7 +262,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - **Repository**: [GitHub](https://github.com/Ravinx001/v0-tax-agent-plan)
 - **v0 Project**: [Open in v0](https://v0.app/chat/projects/prj_xpmaQcSrpQLHNpGHkS1SXmmZ0fyL)
-- **Live Demo**: (Add your deployment URL here)
+- **Live Demo**: 🔗 Live: https://v0-taxbotlk.vercel.app/
 
 ---
 

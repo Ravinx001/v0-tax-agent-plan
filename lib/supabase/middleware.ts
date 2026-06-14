@@ -1,5 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { Redis } from '@upstash/redis'
+
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+})
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -26,66 +32,103 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
-  // With Fluid compute, don't put this client in a global environment
-  // variable. Always create a new one on each request.
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
+  try {
+    // Get session from cookies (fast path)
+    const sessionToken = request.cookies.get('sb-auth-token')?.value
+
+    if (!sessionToken) {
+      // No session cookie - check if route is protected
+      const protectedPaths = ['/protected', '/chat']
+      const isProtectedPath = protectedPaths.some(path => 
+        request.nextUrl.pathname.startsWith(path)
+      )
+
+      if (isProtectedPath) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/auth/login'
+        return NextResponse.redirect(url)
+      }
+
+      return supabaseResponse
+    }
+
+    // Try to validate from cache first (Redis)
+    let isValid = false
+    try {
+      const cachedSession = await Promise.race([
+        redis.get(`session:${sessionToken}`),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Cache timeout')), 2000)
+        ),
+      ]) as string | null
+
+      if (cachedSession === 'valid') {
+        isValid = true
+      }
+    } catch {
+      // Cache check failed or timed out - fall through to Supabase check
+    }
+
+    // If not in cache, validate with Supabase (with timeout)
+    if (!isValid) {
+      const supabase = createServerClient(
+        supabaseUrl,
+        supabaseAnonKey,
+        {
+          cookies: {
+            getAll() {
+              return request.cookies.getAll()
+            },
+            setAll(cookiesToSet) {
+              cookiesToSet.forEach(({ name, value }) =>
+                request.cookies.set(name, value),
+              )
+              supabaseResponse = NextResponse.next({
+                request,
+              })
+              cookiesToSet.forEach(({ name, value, options }) =>
+                supabaseResponse.cookies.set(name, value, options),
+              )
+            },
+          },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          )
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          )
-        },
-      },
-    },
-  )
+      )
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+      // Use Promise.race to enforce a 5-second timeout on auth check
+      const authPromise = supabase.auth.getUser()
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Auth timeout')), 5000)
+      )
 
-  // IMPORTANT: If you remove getUser() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = (await Promise.race([authPromise, timeoutPromise])) as any
 
-  // Protected routes that require authentication
-  const protectedPaths = ['/protected', '/chat']
-  const isProtectedPath = protectedPaths.some(path => 
-    request.nextUrl.pathname.startsWith(path)
-  )
+      if (!user) {
+        // Invalid session
+        const protectedPaths = ['/protected', '/chat']
+        const isProtectedPath = protectedPaths.some(path => 
+          request.nextUrl.pathname.startsWith(path)
+        )
 
-  if (isProtectedPath && !user) {
-    // no user, redirect to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
+        if (isProtectedPath) {
+          const url = request.nextUrl.clone()
+          url.pathname = '/auth/login'
+          return NextResponse.redirect(url)
+        }
+      } else {
+        // Cache valid session for 5 minutes
+        try {
+          await redis.setex(`session:${sessionToken}`, 300, 'valid')
+        } catch {
+          // Cache write failed - continue anyway
+        }
+      }
+    }
+  } catch (error) {
+    // On any error (including timeout), continue - don't block the request
+    console.error('[Middleware Error]', error)
   }
-
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
 
   return supabaseResponse
 }

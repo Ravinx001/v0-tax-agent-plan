@@ -519,7 +519,7 @@ This repository does not currently include a license file. Without an explicit l
 
 ## 🔗 Links
 
-- **Live application:** [v0-taxbotlk.vercel.app]([https://v0-taxbotlk.vercel.app/](https://v0-taxbotlk.vercel.app/))
+- **Live application:** [v0-taxbotlk.vercel.app](https://v0-taxbotlk.vercel.app/)
 - **GitHub repository:** [Ravinx001/v0-tax-agent-plan](https://github.com/Ravinx001/v0-tax-agent-plan)
 - **Issues:** [Report a bug or request a feature](https://github.com/Ravinx001/v0-tax-agent-plan/issues)
 - **v0 project:** [Continue in v0](https://v0.app/chat/projects/prj_xpmaQcSrpQLHNpGHkS1SXmmZ0fyL/)
